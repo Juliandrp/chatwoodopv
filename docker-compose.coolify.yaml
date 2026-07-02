@@ -4,8 +4,10 @@ services:
       context: .
       dockerfile: docker/Dockerfile
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
     environment:
       - SERVICE_FQDN_RAILS_3000=conversa.oportunidaddevida.com
       - NODE_ENV=production
@@ -37,17 +39,20 @@ services:
     restart: always
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3000"]
-      interval: 5s
-      timeout: 20s
-      retries: 10
+      interval: 30s
+      timeout: 30s
+      retries: 20
+      start_period: 300s
 
   sidekiq:
     build:
       context: .
       dockerfile: docker/Dockerfile
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
     environment:
       - NODE_ENV=production
       - RAILS_ENV=production
