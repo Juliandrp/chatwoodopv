@@ -1,0 +1,5 @@
+[phases.build]
+cmds = [
+  "SECRET_KEY_BASE=precompile_placeholder RAILS_LOG_TO_STDOUT=enabled bundle exec rake assets:precompile",
+  "bundle exec bootsnap precompile app/ lib/"
+]
