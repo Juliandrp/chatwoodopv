@@ -1,8 +1,6 @@
 services:
   rails:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
+    image: ghcr.io/juliandrp/chatwoodopv:main
     depends_on:
       postgres:
         condition: service_healthy
@@ -32,6 +30,7 @@ services:
       - SMTP_USERNAME=${SMTP_USERNAME}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_ENABLE_STARTTLS_AUTO=true
+      - RAILS_LOG_TO_STDOUT=enabled
     entrypoint: docker/entrypoints/rails.sh
     command: sh -c "bundle exec rails db:chatwoot_prepare && bundle exec rails s -p 3000 -b 0.0.0.0"
     volumes:
@@ -45,9 +44,7 @@ services:
       start_period: 300s
 
   sidekiq:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
+    image: ghcr.io/juliandrp/chatwoodopv:main
     depends_on:
       postgres:
         condition: service_healthy
@@ -68,6 +65,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - ACTIVE_STORAGE_SERVICE=local
       - GOOGLE_GEMINI_API_KEY=${GOOGLE_GEMINI_API_KEY}
+      - RAILS_LOG_TO_STDOUT=enabled
     command: ["bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"]
     volumes:
       - storage_data:/app/storage
