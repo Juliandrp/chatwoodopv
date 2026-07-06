@@ -2,8 +2,6 @@ services:
   rails:
     image: ghcr.io/juliandrp/chatwoodopv:main
     depends_on:
-      postgres:
-        condition: service_healthy
       redis:
         condition: service_started
     environment:
@@ -18,7 +16,7 @@ services:
       - REDIS_URL=redis://default:${REDIS_PASSWORD}@redis:6379
       - REDIS_PASSWORD=${REDIS_PASSWORD}
       - POSTGRES_DATABASE=${POSTGRES_DB:-chatwoot}
-      - POSTGRES_HOST=postgres
+      - POSTGRES_HOST=${POSTGRES_HOST:-pgc4ck4ck8s48w84s40koc48}
       - POSTGRES_USERNAME=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - RAILS_MAX_THREADS=5
@@ -51,8 +49,6 @@ services:
   sidekiq:
     image: ghcr.io/juliandrp/chatwoodopv:main
     depends_on:
-      postgres:
-        condition: service_healthy
       redis:
         condition: service_started
     environment:
@@ -65,7 +61,7 @@ services:
       - REDIS_URL=redis://default:${REDIS_PASSWORD}@redis:6379
       - REDIS_PASSWORD=${REDIS_PASSWORD}
       - POSTGRES_DATABASE=${POSTGRES_DB:-chatwoot}
-      - POSTGRES_HOST=postgres
+      - POSTGRES_HOST=${POSTGRES_HOST:-pgc4ck4ck8s48w84s40koc48}
       - POSTGRES_USERNAME=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - ACTIVE_STORAGE_SERVICE=local
@@ -75,21 +71,6 @@ services:
     volumes:
       - storage_data:/app/storage
     restart: always
-
-  postgres:
-    image: pgvector/pgvector:pg16
-    restart: always
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB:-chatwoot}
-      - POSTGRES_USER=${POSTGRES_USER:-postgres}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   redis:
     image: redis:alpine
@@ -102,7 +83,6 @@ services:
 
 volumes:
   storage_data:
-  postgres_data:
   redis_data:
 
 networks:
