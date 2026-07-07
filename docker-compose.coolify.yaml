@@ -39,12 +39,6 @@ services:
         aliases:
           - rails-conversa
     restart: always
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3000"]
-      interval: 30s
-      timeout: 30s
-      retries: 20
-      start_period: 300s
 
   sidekiq:
     image: ghcr.io/juliandrp/chatwoodopv:main
