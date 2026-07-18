@@ -32,9 +32,15 @@ services:
       - SMTP_ENABLE_STARTTLS_AUTO=true
       - RAILS_LOG_TO_STDOUT=enabled
     entrypoint: docker/entrypoints/rails.sh
-    command: sh -c "(bundle exec rails db:chatwoot_prepare; echo '=== PREPARE DONE ==='; bundle exec rails s -p 3000 -b 0.0.0.0; echo \"=== SERVER EXITED rc=$? ===\") > /app/storage/boot.log 2>&1; echo STREAMING_BOOT_LOG; tail -n +1 -f /app/storage/boot.log"
+    command: sh -c "bundle exec rails db:chatwoot_prepare && bundle exec rails s -p 3000 -b 0.0.0.0"
     volumes:
       - storage_data:/app/storage
+    healthcheck:
+      test: ["CMD-SHELL", "ruby -rsocket -e 'TCPSocket.new(\"127.0.0.1\", 3000).close' || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 15
+      start_period: 240s
     networks:
       default:
       coolify:
@@ -65,7 +71,7 @@ services:
       - ACTIVE_STORAGE_SERVICE=local
       - GOOGLE_GEMINI_API_KEY=${GOOGLE_GEMINI_API_KEY}
       - RAILS_LOG_TO_STDOUT=enabled
-    command: ["sh", "-c", "echo '=== sidekiq paused, streaming rails boot.log ==='; sleep 20; tail -n +1 -F /app/storage/boot.log"]
+    command: ["bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"]
     volumes:
       - storage_data:/app/storage
     restart: always
