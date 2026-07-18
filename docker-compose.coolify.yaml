@@ -16,7 +16,7 @@ services:
       - FORCE_SSL=true
       - ENABLE_ACCOUNT_SIGNUP=false
       - REDIS_URL=redis://conversa-redis:6379
-      - REDIS_PASSWORD=
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
       - POSTGRES_DATABASE=${POSTGRES_DB:-chatwoot}
       - POSTGRES_HOST=conversa-db
       - POSTGRES_USERNAME=${POSTGRES_USER:-postgres}
@@ -57,7 +57,7 @@ services:
       - FRONTEND_URL=https://conversa.oportunidaddevida.com
       - FORCE_SSL=true
       - REDIS_URL=redis://conversa-redis:6379
-      - REDIS_PASSWORD=
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
       - POSTGRES_DATABASE=${POSTGRES_DB:-chatwoot}
       - POSTGRES_HOST=conversa-db
       - POSTGRES_USERNAME=${POSTGRES_USER:-postgres}
@@ -88,7 +88,9 @@ services:
   conversa-redis:
     image: redis:alpine
     restart: always
-    command: ["redis-server", "--appendonly", "yes"]
+    command: ["sh", "-c", "exec redis-server --appendonly yes --requirepass \"$REDIS_PASSWORD\""]
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     volumes:
       - redis_data:/data
 
