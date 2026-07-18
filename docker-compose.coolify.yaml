@@ -80,7 +80,7 @@ services:
     image: pgvector/pgvector:pg16
     restart: always
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - conversa_pg_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=${POSTGRES_DB:-chatwoot}
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
@@ -102,7 +102,7 @@ services:
 
 volumes:
   storage_data:
-  postgres_data:
+  conversa_pg_data:
   redis_data:
 
 networks:
