@@ -4,7 +4,7 @@ services:
     depends_on:
       conversa-db:
         condition: service_healthy
-      redis:
+      conversa-redis:
         condition: service_started
     environment:
       - SERVICE_FQDN_RAILS_3000=conversa.oportunidaddevida.com
@@ -15,7 +15,7 @@ services:
       - FRONTEND_URL=https://conversa.oportunidaddevida.com
       - FORCE_SSL=true
       - ENABLE_ACCOUNT_SIGNUP=false
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=redis://conversa-redis:6379
       - REDIS_PASSWORD=
       - POSTGRES_DATABASE=${POSTGRES_DB:-chatwoot}
       - POSTGRES_HOST=conversa-db
@@ -47,7 +47,7 @@ services:
     depends_on:
       conversa-db:
         condition: service_healthy
-      redis:
+      conversa-redis:
         condition: service_started
     environment:
       - NODE_ENV=production
@@ -56,7 +56,7 @@ services:
       - SECRET_KEY_BASE=${SECRET_KEY_BASE}
       - FRONTEND_URL=https://conversa.oportunidaddevida.com
       - FORCE_SSL=true
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=redis://conversa-redis:6379
       - REDIS_PASSWORD=
       - POSTGRES_DATABASE=${POSTGRES_DB:-chatwoot}
       - POSTGRES_HOST=conversa-db
@@ -85,7 +85,7 @@ services:
       timeout: 5s
       retries: 10
 
-  redis:
+  conversa-redis:
     image: redis:alpine
     restart: always
     command: ["redis-server", "--appendonly", "yes"]
