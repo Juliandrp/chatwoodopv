@@ -32,27 +32,7 @@ services:
       - SMTP_ENABLE_STARTTLS_AUTO=true
       - RAILS_LOG_TO_STDOUT=enabled
     entrypoint: docker/entrypoints/rails.sh
-    command:
-      - sh
-      - -c
-      - |
-        bundle exec rails db:chatwoot_prepare
-        bundle exec rails runner '
-          if User.count.zero?
-            pass = SecureRandom.alphanumeric(10) + "Aa1!"
-            acc = Account.create!(name: "Oportunidad de Vida")
-            u = User.new(name: "Julian Rodriguez", email: "juliandrp23@gmail.com", password: pass, password_confirmation: pass, type: "SuperAdmin")
-            u.skip_confirmation!
-            u.save!
-            AccountUser.create!(account_id: acc.id, user_id: u.id, role: :administrator)
-            File.write("/app/storage/admin_creds.txt", "email=juliandrp23@gmail.com password=" + pass + "\n")
-            puts "ADMIN_CREATED"
-          else
-            File.write("/app/storage/admin_creds.txt", "admin already exists count=" + User.count.to_s + "\n")
-            puts "ADMIN_EXISTS"
-          end
-        '
-        bundle exec rails s -p 3000 -b 0.0.0.0
+    command: sh -c "rm -f /app/storage/admin_creds.txt; bundle exec rails db:chatwoot_prepare && bundle exec rails s -p 3000 -b 0.0.0.0"
     volumes:
       - storage_data:/app/storage
     healthcheck:
@@ -91,15 +71,7 @@ services:
       - ACTIVE_STORAGE_SERVICE=local
       - GOOGLE_GEMINI_API_KEY=${GOOGLE_GEMINI_API_KEY}
       - RAILS_LOG_TO_STDOUT=enabled
-    command:
-      - sh
-      - -c
-      - |
-        echo "=====CREDS_START====="
-        sleep 30
-        cat /app/storage/admin_creds.txt 2>/dev/null || echo "no creds file yet"
-        echo "=====CREDS_END====="
-        exec bundle exec sidekiq -C config/sidekiq.yml
+    command: ["bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"]
     volumes:
       - storage_data:/app/storage
     restart: always
