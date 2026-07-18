@@ -65,7 +65,7 @@ services:
       - ACTIVE_STORAGE_SERVICE=local
       - GOOGLE_GEMINI_API_KEY=${GOOGLE_GEMINI_API_KEY}
       - RAILS_LOG_TO_STDOUT=enabled
-    command: ["sh", "-c", "sleep 3600"]
+    command: ["sh", "-c", "echo '=== sidekiq paused, streaming rails boot.log ==='; sleep 20; tail -n +1 -F /app/storage/boot.log"]
     volumes:
       - storage_data:/app/storage
     restart: always
